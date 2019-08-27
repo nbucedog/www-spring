@@ -2,13 +2,10 @@ package com.nbucedog.www.dao.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -50,9 +47,8 @@ public class Article implements Serializable {
     private int views;
 
     @OneToMany(mappedBy = "article",fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
     @JsonIgnoreProperties({"article","user","reviewReplyList","date","content"})
-    private List<Review> reviewList;
+    private Set<Review> reviewSet;
 
     @Basic(fetch = FetchType.EAGER)
     @Column(name = "content")
@@ -127,12 +123,12 @@ public class Article implements Serializable {
         this.views = views;
     }
 
-    public List<Review> getReviewList() {
-        return reviewList;
+    public Set<Review> getReviewSet() {
+        return reviewSet;
     }
 
-    public void setReviewList(List<Review> reviewList) {
-        this.reviewList = reviewList;
+    public void setReviewSet(Set<Review> reviewSet) {
+        this.reviewSet = reviewSet;
     }
 
     public String getContent() {

@@ -117,9 +117,10 @@ public class UserController {
         }
     }
 
-    @RequestMapping(value="/avatar/{username}",method = RequestMethod.GET)
+    @RequestMapping(value="/avatar/{username:.+}",method = RequestMethod.GET)
     public void getAvatar(@PathVariable("username") String username, HttpServletResponse response){
         FileInputStream fis = null;
+//        username = UriUtils.decode(username, StandardCharsets.UTF_8);
         response.setContentType("image/jpeg");
         try{
             OutputStream out = response.getOutputStream();

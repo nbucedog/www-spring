@@ -20,11 +20,11 @@ public class Articles implements Serializable {
         this.nickname = article.getUser().getNickname();
         this.thumbs = article.getThumbs();
         this.views = article.getViews();
-        this.comments = article.getReviewList().size();
+        this.comments = article.getReviewSet().size();
         this.tagSet = article.getTagSet();
     }
 
-    private int id;
+    private Integer id;
     private String title;
     private String summary;
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -33,15 +33,14 @@ public class Articles implements Serializable {
     private int thumbs;
     private int views;
     private int comments;
-
     @JsonIgnoreProperties("articleList")
     private Set<Tag> tagSet;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
