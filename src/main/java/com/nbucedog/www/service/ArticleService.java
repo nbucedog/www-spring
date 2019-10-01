@@ -1,6 +1,7 @@
 package com.nbucedog.www.service;
 
 import com.nbucedog.www.dao.entity.Article;
+import com.nbucedog.www.dao.entity.User;
 import com.nbucedog.www.dao.repository.ArticleDAO;
 import com.nbucedog.www.model.Articles;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,21 +9,26 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 public class ArticleService {
     @Autowired
     ArticleDAO articleDAO;
 
-    public List<Articles> getArticles(){
-        return articleDAO.getArticles();
+    public Page<Articles> getArticles(int pageIndex, int pageSize, User user){
+        Pageable pageable = PageRequest.of(pageIndex,pageSize, Sort.Direction.DESC,"id");
+        if(user==null){
+            return articleDAO.getArticles(pageable);
+        }
+        else {
+            return articleDAO.getArticles(user, pageable);
+        }
     }
 
-    public Page<Article> findByPage(int pageIndex, int pageSize, Example<Article> articleExample){
-        Pageable pageable = PageRequest.of(pageIndex,pageSize, Sort.Direction.DESC,"id");
-        return articleDAO.findAll(articleExample,pageable);
-    }
+//    public Page<Article> findByPage(int pageIndex, int pageSize, Example<Article> articleExample){
+//        Pageable pageable = PageRequest.of(pageIndex,pageSize, Sort.Direction.DESC,"id");
+//        return articleDAO.findAll(articleExample,pageable);
+//    }
 
     public Article findById(Integer id){
         return articleDAO.findById(id).orElse(null);

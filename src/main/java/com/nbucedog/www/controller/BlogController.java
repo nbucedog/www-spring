@@ -11,8 +11,6 @@ import com.nbucedog.www.util.CookieTools;
 import com.nbucedog.www.util.ResultTools;
 import com.nbucedog.www.util.SplitTools;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
@@ -43,13 +41,14 @@ public class BlogController {
 
     @RequestMapping(value = "/articles",method = RequestMethod.GET)
     @ResponseBody
-    public Map getArticles(Integer pageIndex,Integer pageSize,Integer userId,Integer tagId){
+    public Map getArticles(HttpServletRequest request,Integer pageIndex,Integer pageSize){
         try {
             if(pageIndex==null || pageSize==null){
-                List<Articles> articlesList = articleService.getArticles();
+                List<Articles> articlesList = articleService.getArticles(0,5,null).getContent();
                 return ResultTools.dataResult(0,articlesList);
             }
-            else if(tagId!=null){
+            else if(request.getParameter("tagId")!=null){
+                int tagId = Integer.valueOf(request.getParameter("tagId"));
                 List<Article> articleList = tagService.findById(tagId).getArticleList();
                 long total = articleList.size();
                 long pageStart = pageIndex*pageSize;
@@ -69,21 +68,29 @@ public class BlogController {
             }
             else {
                 Article article = new Article();
-                article.setPublish(true);
-                if (userId!=null){
+                if (request.getParameter("userId")!=null){
+                    int userId = Integer.valueOf(request.getParameter("userId"));
                     article.setUser(userService.findById(userId));
                 }
-                ExampleMatcher matcher = ExampleMatcher.matching().withIgnorePaths("id","views","thumbs");
-                Example<Article> articleExample = Example.of(article,matcher);
-                Page<Article> articlePage = articleService.findByPage(pageIndex,pageSize,articleExample);
-                List<Articles> articlesList = new ArrayList<>();
-                List<Article> articleList = articlePage.getContent();
-                for (Article article1:articleList){
-                    articlesList.add(new Articles(article1));
-                }
-                long total = articlePage.getTotalElements();
+                Page<Articles> articlesPage = articleService.getArticles(pageIndex,pageSize,article.getUser());
+                long total = articlesPage.getTotalElements();
+                List<Articles> articlesList = articlesPage.getContent();
                 return ResultTools.dataResult(0,total,articlesList);
             }
+//            else {
+//                Article article = new Article();
+//                article.setPublish(true);
+//                if (request.getParameter("userId")!=null){
+//                    int userId = Integer.valueOf(request.getParameter("userId"));
+//                    article.setUser(userService.findById(userId));
+//                }
+//                ExampleMatcher matcher = ExampleMatcher.matching().withIgnorePaths("id","views","thumbs");
+//                Example<Article> articleExample = Example.of(article,matcher);
+//                Page<Article> articlePage = articleService.findByPage(pageIndex,pageSize,articleExample);
+//                List<Article> articleList = articlePage.getContent();
+//                long total = articlePage.getTotalElements();
+//                return ResultTools.dataResult(0,total,articleList);
+//            }
 
         }catch (Exception e){
             e.printStackTrace();

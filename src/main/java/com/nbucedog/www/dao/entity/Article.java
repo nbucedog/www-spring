@@ -63,6 +63,9 @@ public class Article implements Serializable {
     @Column(name="publish")
     private Boolean publish;
 
+    @Transient
+    private int comments;
+
     /**
      * setter and getter
      */
@@ -153,5 +156,14 @@ public class Article implements Serializable {
 
     public void setPublish(Boolean publish) {
         this.publish = publish;
+    }
+
+    public void setComments(int comments) {
+        this.comments = comments;
+    }
+
+    public int getComments() {
+        comments = reviewSet.size();
+        return comments;
     }
 }
