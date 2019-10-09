@@ -19,13 +19,21 @@ public class GlobalExceptionHandler {
         this.objectMapper = objectMapper;
     }
 
-    @ExceptionHandler(value = SpelEvaluationException.class)
-    public void spelEvaluationException(HttpServletResponse response,SpelEvaluationException e) throws IOException {
+    @ExceptionHandler(value = {IllegalArgumentException.class,SpelEvaluationException.class})
+    public void spelEvaluationException(HttpServletResponse response,Exception e) throws IOException {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json;charset=UTF-8");
         response.addCookie(CookieTools.buildCookie("username","",0,false));
         response.addCookie(CookieTools.buildCookie("nickname","",0,false));
         response.addCookie(CookieTools.buildCookie("id","",0,false));
         response.getWriter().write(objectMapper.writeValueAsString(ResultTools.dataResult(403,e.getMessage())));
+    }
+
+    @ExceptionHandler(value = Exception.class)
+    public void exception(HttpServletResponse response,Exception e) throws IOException{
+        e.printStackTrace();
+        response.setStatus(HttpStatus.OK.value());
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(ResultTools.dataResult(1000,e.getMessage())));
     }
 }
